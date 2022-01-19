@@ -1,19 +1,22 @@
 package ru.kata.spring.boot_security.demo.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import ru.kata.spring.boot_security.demo.models.Role;
 import ru.kata.spring.boot_security.demo.models.User;
 import ru.kata.spring.boot_security.demo.repositories.UserRepository;
-import ru.kata.spring.boot_security.demo.security.UserDetailsImpl;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
-public class UserServiceImpl implements UserService, UserDetailsService {
+public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
@@ -24,13 +27,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> user = userRepository.findByUsername( username );
+        Optional<User> user = findByUsername(username);
 
         if (user.isEmpty()){
             throw new UsernameNotFoundException("User not found");
         }
-        return new UserDetailsImpl(user.get());
+        return new org.springframework.security.core.userdetails.User(user.get().getUsername(), user.get().getPassword(), user.get().getAuthorities());
     }
+
 
     @Override
     public List<User> findAll() {
@@ -48,6 +52,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return userRepository.findById(id).orElse(null);
     }
 
+    @Transactional
     @Override
     public void save(User user) {
         user.setPassword(new BCryptPasswordEncoder().encode( user.getPassword()));
@@ -55,6 +60,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         userRepository.save(user);
     }
 
+    @Transactional
     @Override
     public void update(int id, User updatedUser) {
         updatedUser.setId(id);
@@ -63,6 +69,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         userRepository.save(updatedUser);
     }
 
+    @Transactional
     @Override
     public void delete(int id) {
         userRepository.deleteById(id);

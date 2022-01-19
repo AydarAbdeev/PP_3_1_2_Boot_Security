@@ -6,8 +6,8 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.kata.spring.boot_security.demo.models.User;
-import ru.kata.spring.boot_security.demo.services.RoleServiceImpl;
-import ru.kata.spring.boot_security.demo.services.UserServiceImpl;
+import ru.kata.spring.boot_security.demo.services.RoleService;
+import ru.kata.spring.boot_security.demo.services.UserService;
 import ru.kata.spring.boot_security.demo.util.UserValidator;
 
 import javax.validation.Valid;
@@ -16,14 +16,14 @@ import javax.validation.Valid;
 @RequestMapping("/admin")
 public class AdminController {
 
-    private final UserServiceImpl userService;
+    private final UserService userService;
 
     private final UserValidator userValidator;
 
-    private final RoleServiceImpl roleService;
+    private final RoleService roleService;
 
     @Autowired
-    public AdminController(UserServiceImpl userService, UserValidator userValidator, RoleServiceImpl roleService) {
+    public AdminController(UserService userService, UserValidator userValidator, RoleService roleService) {
         this.userService = userService;
         this.userValidator = userValidator;
         this.roleService = roleService;
